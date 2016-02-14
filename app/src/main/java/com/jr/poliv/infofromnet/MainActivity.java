@@ -60,7 +60,8 @@ public class MainActivity extends AppCompatActivity {
     public String getInfoFromWebsite() throws IOException {
         InputStream is = null;
         try {
-            URL oracle = new URL("http://www.xe.com/currencyconverter/convert/?Amount=1&From=USD&To=JMD");
+            int num = 0;
+            URL oracle = new URL("http://www.boj.org.jm/foreign_exchange/fx_trading_summary.php");
             HttpURLConnection in = (HttpURLConnection) oracle.openConnection();
             in.setReadTimeout(10000 /* milliseconds */);
             in.setConnectTimeout(15000 /* milliseconds */);
@@ -69,7 +70,12 @@ public class MainActivity extends AppCompatActivity {
             in.connect();
             Log.d("Paul", "The response is: " + in.getResponseCode());
             is = in.getInputStream();
-            String inputStream = readIt(is, 100);
+            String inputStream = readIt(is, 1);
+//            while (!(inputStream.equals("O"))) {
+//                inputStream = readIt(is, 1);
+//                num += 1;
+//                Log.d("Paul", String.valueOf(num));
+//            }
             if (inputStream != null)
                 Log.d("Paul", "It worked");
             return inputStream;
@@ -83,6 +89,11 @@ public class MainActivity extends AppCompatActivity {
     public String readIt(InputStream stream, int len) throws IOException, UnsupportedEncodingException {
         Reader reader;
         reader = new InputStreamReader(stream, "UTF-8");
+//        reader.skip(1000000000);
+//        reader.skip(1000000000);
+//        reader.skip(1000000000);
+//        reader.skip(10000000);
+//        reader.skip(1);
         char[] buffer = new char[len];
         reader.read(buffer);
         return new String(buffer);
