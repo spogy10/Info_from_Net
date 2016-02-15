@@ -13,6 +13,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.TextView;
 
 import com.google.android.gms.appindexing.Action;
@@ -34,7 +35,8 @@ import java.net.URLConnection;
 
 
 public class MainActivity extends AppCompatActivity {
-    TextView textView;
+    EditText editText, editText2;
+
 
     /**
      * ATTENTION: This was auto-generated to implement the App Indexing API.
@@ -48,7 +50,9 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        textView = (TextView) findViewById(R.id.text);
+        editText = (EditText) findViewById(R.id.editText);
+        editText2 = (EditText) findViewById(R.id.editText2);
+
 
         new ReadFromWebsite().execute();
 
@@ -118,7 +122,7 @@ public class MainActivity extends AppCompatActivity {
 
 
        protected void onPostExecute(String result){
-           textView.setText(result);
+           Log.d("Paul", result);//editText.setText(result);
        }
     }
 
