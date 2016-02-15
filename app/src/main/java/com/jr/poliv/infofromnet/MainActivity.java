@@ -19,6 +19,8 @@ import com.google.android.gms.appindexing.Action;
 import com.google.android.gms.appindexing.AppIndex;
 import com.google.android.gms.common.api.GoogleApiClient;
 
+import org.apache.commons.io.IOUtils;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -60,7 +62,6 @@ public class MainActivity extends AppCompatActivity {
     public String getInfoFromWebsite() throws IOException {
         InputStream is = null;
         try {
-            int num = 0;
             URL oracle = new URL("http://www.boj.org.jm/foreign_exchange/fx_trading_summary.php");
             HttpURLConnection in = (HttpURLConnection) oracle.openConnection();
             in.setReadTimeout(10000 /* milliseconds */);
@@ -70,12 +71,8 @@ public class MainActivity extends AppCompatActivity {
             in.connect();
             Log.d("Paul", "The response is: " + in.getResponseCode());
             is = in.getInputStream();
-            String inputStream = readIt(is, 1);
-//            while (!(inputStream.equals("O"))) {
-//                inputStream = readIt(is, 1);
-//                num += 1;
-//                Log.d("Paul", String.valueOf(num));
-//            }
+            String inputStream = extractExchangeRate(IOUtils.toString(is, "UTF-8"));
+
             if (inputStream != null)
                 Log.d("Paul", "It worked");
             return inputStream;
@@ -89,14 +86,18 @@ public class MainActivity extends AppCompatActivity {
     public String readIt(InputStream stream, int len) throws IOException, UnsupportedEncodingException {
         Reader reader;
         reader = new InputStreamReader(stream, "UTF-8");
-//        reader.skip(1000000000);
-//        reader.skip(1000000000);
-//        reader.skip(1000000000);
-//        reader.skip(10000000);
-//        reader.skip(1);
+        Log.d("Paul", String.valueOf(stream.markSupported()));
         char[] buffer = new char[len];
         reader.read(buffer);
         return new String(buffer);
+    }
+
+    public String extractExchangeRate(String string){
+        string = string.substring(string.indexOf("<td align=\"center\" width=\"198px\"><b>SALES</b></td>\n" +
+                "                          </tr>\n" +
+                "                          \n" +
+                "\t\t\t\t\t<tr><td >USD</td><td align=\"right\">"));
+        return string.substring(150,158);
     }
 
 
@@ -109,8 +110,8 @@ public class MainActivity extends AppCompatActivity {
                 return getInfoFromWebsite();
 
             } catch (IOException e) {
-                Log.d("Paul", "nah it didnt work");
-                return "It didnt work";
+                Log.d("Paul", "nah it didn't work");
+                return "It didn't work";
             }
 
         }
