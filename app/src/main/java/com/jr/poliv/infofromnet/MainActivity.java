@@ -35,6 +35,7 @@ import java.net.URLConnection;
 
 
 public class MainActivity extends AppCompatActivity {
+    public String input;
     EditText editText, editText2;
 
 
@@ -53,8 +54,11 @@ public class MainActivity extends AppCompatActivity {
         editText = (EditText) findViewById(R.id.editText);
         editText2 = (EditText) findViewById(R.id.editText2);
 
-
         new ReadFromWebsite().execute();
+
+
+
+
 
 
 
@@ -63,11 +67,12 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+
     public String getInfoFromWebsite() throws IOException {
         InputStream is = null;
         try {
-            URL oracle = new URL("http://www.boj.org.jm/foreign_exchange/fx_trading_summary.php");
-            HttpURLConnection in = (HttpURLConnection) oracle.openConnection();
+            URL url = new URL("http://www.boj.org.jm/foreign_exchange/fx_trading_summary.php");
+            HttpURLConnection in = (HttpURLConnection) url.openConnection();
             in.setReadTimeout(10000 /* milliseconds */);
             in.setConnectTimeout(15000 /* milliseconds */);
             in.setRequestMethod("GET");
@@ -87,21 +92,27 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    public String readIt(InputStream stream, int len) throws IOException, UnsupportedEncodingException {
-        Reader reader;
-        reader = new InputStreamReader(stream, "UTF-8");
-        Log.d("Paul", String.valueOf(stream.markSupported()));
-        char[] buffer = new char[len];
-        reader.read(buffer);
-        return new String(buffer);
-    }
+//    public String readIt(InputStream stream, int len) throws IOException, UnsupportedEncodingException {
+//        Reader reader;
+//        reader = new InputStreamReader(stream, "UTF-8");
+//        Log.d("Paul", String.valueOf(stream.markSupported()));
+//        char[] buffer = new char[len];
+//        reader.read(buffer);
+//        return new String(buffer);
+//    }
 
-    public String extractExchangeRate(String string){
-        string = string.substring(string.indexOf("<td align=\"center\" width=\"198px\"><b>SALES</b></td>\n" +
+    public static String extractExchangeRate(String string){
+        String intro = "<b>10-DAY MOVING AVERAGE RATE</b></td>\n" +
+                "                          </tr>\n" +
+                "                          <tr>\n" +
+                "                            <td><b>CURRENCY</b></td>\n" +
+                "                            <td align=\"center\" width=\"256px\"><b>PURCHASE</b></td>\n" +
+                "                            <td align=\"center\" width=\"198px\"><b>SALES</b></td>\n" +
                 "                          </tr>\n" +
                 "                          \n" +
-                "\t\t\t\t\t<tr><td >USD</td><td align=\"right\">"));
-        return string.substring(150,158);
+                "\t\t\t\t\t<tr><td >USD</td><td align=\"right\">";
+        string = string.substring(string.indexOf(intro));
+        return string.substring(intro.length(),intro.length()+8);
     }
 
 
@@ -122,7 +133,7 @@ public class MainActivity extends AppCompatActivity {
 
 
        protected void onPostExecute(String result){
-           Log.d("Paul", result);//editText.setText(result);
+           editText.setText(result);//Log.d("Paul", result);
        }
     }
 
