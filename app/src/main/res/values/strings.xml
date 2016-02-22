@@ -4,6 +4,6 @@
     <string name="text_view_id">text</string>
     <string name="title_activity_main2">Main2Activity</string>
     <string name="button_label">convert</string>
-    <string name="file_name">com.jr.poliv.infofromnet.EXCHANGE_RATE</string>
-    <string name="file_string_name">Exchange_Rate</string>
+    <string name="folder_name">com.jr.poliv.infofromnet</string>
+    <string name="file_name">com.jr.poliv.infofromnet.Exchange_Rate</string>
 </resources>

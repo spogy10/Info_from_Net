@@ -34,6 +34,8 @@ import java.util.concurrent.TimeoutException;
 
 public class MainActivity extends AppCompatActivity {
     public static String dataFromAsyncTask;
+    final public String folder_name = getString(R.string.folder_name);
+    final public String file_name = getString(R.string.file_name);
     double exchangeRate = 0;
     Button button;
     EditText editText, editText2;
@@ -57,12 +59,12 @@ public class MainActivity extends AppCompatActivity {
         editText = (EditText) findViewById(R.id.editText);
         editText2 = (EditText) findViewById(R.id.editText2);
         button = (Button) findViewById(R.id.button);
-        file = this.getPreferences(Context.MODE_PRIVATE);
+        file = this.getSharedPreferences(folder_name, Context.MODE_PRIVATE);
 
-        if (!file.contains(String.valueOf(R.string.file_string_name)))
+        if (!file.contains(file_name))
             Toast.makeText(MainActivity.this, "Update Exchange Rate", Toast.LENGTH_LONG).show();
         else{
-            exchangeRate = Double.parseDouble(file.getString(getString(R.string.file_string_name), "0"));
+            exchangeRate = Double.parseDouble(file.getString(file_name, "0"));
         }
 
         button.setOnClickListener(new View.OnClickListener() {
@@ -205,7 +207,8 @@ public class MainActivity extends AppCompatActivity {
             exchangeRate = Double.parseDouble(dataFromAsyncTask);
             Log.d("Paul", "The Exchange rate variable has been changed to " + String.format("%.4f", exchangeRate));
             editor = file.edit();
-            editor.putString(getString(R.string.file_string_name), dataFromAsyncTask);
+            if(editor.putString(file_name, dataFromAsyncTask).commit())
+                Log.d("Paul", "written to file");
             return true;
         }
 
