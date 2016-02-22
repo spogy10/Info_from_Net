@@ -1,42 +1,45 @@
 package com.jr.poliv.infofromnet;
 
-import android.content.Intent;
+import android.app.AlertDialog;
+import android.app.Dialog;
+import android.app.DialogFragment;
+import android.content.Context;
+import android.content.DialogInterface;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
+import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
-import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.ViewGroup;
+import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.TextView;
+import android.widget.Toast;
 
-import com.google.android.gms.appindexing.Action;
-import com.google.android.gms.appindexing.AppIndex;
 import com.google.android.gms.common.api.GoogleApiClient;
 
 import org.apache.commons.io.IOUtils;
 
-import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Reader;
-import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
-import java.net.URI;
 import java.net.URL;
-import java.net.URLConnection;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 
 public class MainActivity extends AppCompatActivity {
-    public String input;
+    public static String dataFromAsyncTask;
+    double exchangeRate = 0;
+    Button button;
     EditText editText, editText2;
+    DialogFragment dialog = new OkDialog();
+    SharedPreferences file;
+    SharedPreferences.Editor editor;
 
 
     /**
@@ -53,13 +56,31 @@ public class MainActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         editText = (EditText) findViewById(R.id.editText);
         editText2 = (EditText) findViewById(R.id.editText2);
+        button = (Button) findViewById(R.id.button);
+        file = this.getPreferences(Context.MODE_PRIVATE);
 
-        new ReadFromWebsite().execute();
+        if (!file.contains(String.valueOf(R.string.file_string_name)))
+            Toast.makeText(MainActivity.this, "Update Exchange Rate", Toast.LENGTH_LONG).show();
+        else{
+            exchangeRate = Double.parseDouble(file.getString(getString(R.string.file_string_name), "0"));
+        }
 
-
-
-
-
+        button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (exchangeRate == 0)
+                    Toast.makeText(MainActivity.this, "Update Exchange Rate", Toast.LENGTH_LONG).show();
+                else {
+                    if (editText.getText().toString().equals("") && (editText2.getText().toString().equals("")))
+                        Toast.makeText(MainActivity.this, "Both fields cannot be empty", Toast.LENGTH_LONG).show();
+                    else
+                        if (editText.getText().toString().equals(""))
+                            setJA();
+                        else
+                            setUS();
+                }
+            }
+        });
 
 
 
@@ -67,6 +88,21 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+    public double jaToUs(double ja){
+        return ja/exchangeRate;
+    }
+
+    public double usTOJa(double us){
+        return us * exchangeRate;
+    }
+
+    public void setUS(){
+        editText2.setText(String.format("%.2f",jaToUs(Double.parseDouble(editText.getText().toString()))));
+    }
+
+    public  void setJA(){
+        editText.setText(String.format("%.2f",usTOJa(Double.parseDouble(editText2.getText().toString()))));
+    }
 
     public String getInfoFromWebsite() throws IOException {
         InputStream is = null;
@@ -118,7 +154,6 @@ public class MainActivity extends AppCompatActivity {
 
    public class ReadFromWebsite extends AsyncTask<Object, Void, String> {
 
-
         @Override
         protected String doInBackground(Object[] params) {
             try {
@@ -133,9 +168,11 @@ public class MainActivity extends AppCompatActivity {
 
 
        protected void onPostExecute(String result){
-           editText.setText(result);//Log.d("Paul", result);
+           Log.d("Paul", "Result is "+result);
        }
-    }
+
+
+   }
 
 
     @Override
@@ -153,10 +190,48 @@ public class MainActivity extends AppCompatActivity {
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
+        if (id == R.id.update_exchange_rate) {
+            try {
+                dataFromAsyncTask = new ReadFromWebsite().execute().get(10,TimeUnit.SECONDS);
+            } catch (InterruptedException e) {
+                Log.d("Paul", String.valueOf(e));
+            } catch (ExecutionException e) {
+                Log.d("Paul", String.valueOf(e));
+            } catch (TimeoutException e) {
+                dialog.show(getFragmentManager(), "");
+                Log.d("Paul", String.valueOf(e));
+            }
+            Log.d("Paul", "Exchange rate is "+dataFromAsyncTask);//editText2.setText(dataFromAsyncTask);
+            exchangeRate = Double.parseDouble(dataFromAsyncTask);
+            Log.d("Paul", "The Exchange rate variable has been changed to " + String.format("%.4f", exchangeRate));
+            editor = file.edit();
+            editor.putString(getString(R.string.file_string_name), dataFromAsyncTask);
             return true;
         }
 
         return super.onOptionsItemSelected(item);
+    }
+    public class OkDialog extends DialogFragment
+    {
+        public OkDialog()
+        {
+
+        }
+
+        @Override
+        public Dialog onCreateDialog(Bundle savedInstanceState)
+        {
+
+            return new AlertDialog.Builder(getActivity())
+                    .setTitle("")
+                    .setMessage("System Timed Out")
+                    .setNeutralButton("OK", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+
+                        }
+                    })
+                    .create();
+        }
     }
 }

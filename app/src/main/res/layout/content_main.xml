@@ -13,18 +13,41 @@
     tools:showIn="@layout/activity_main">
 
 
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="43dp"
+        android:text="JA$ "
+        android:textSize="20dp"
+        android:gravity="center"
+        android:id="@+id/textView"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true" />
+
     <EditText
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/editText" />
+        android:id="@+id/editText"
+        android:layout_alignTop="@+id/textView"
+        android:layout_toEndOf="@+id/textView" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="43dp"
+        android:text="US$ "
+        android:textSize="20dp"
+        android:gravity="center"
+        android:id="@+id/textView2"
+        android:layout_below="@+id/editText"
+        android:layout_marginTop="84dp"
+        android:layout_alignParentStart="true"/>
 
     <EditText
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:id="@+id/editText2"
         android:layout_below="@+id/editText"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="84dp" />
+        android:layout_marginTop="84dp"
+        android:layout_toEndOf="@+id/textView2" />
 
     <Button
         android:layout_width="wrap_content"

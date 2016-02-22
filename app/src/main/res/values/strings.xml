@@ -1,7 +1,9 @@
 <resources>
     <string name="app_name">Info from Net</string>
-    <string name="action_settings">Settings</string>
+    <string name="update_exchange_rate">Update Exchange Rate</string>
     <string name="text_view_id">text</string>
     <string name="title_activity_main2">Main2Activity</string>
     <string name="button_label">convert</string>
+    <string name="file_name">com.jr.poliv.infofromnet.EXCHANGE_RATE</string>
+    <string name="file_string_name">Exchange_Rate</string>
 </resources>
