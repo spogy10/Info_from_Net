@@ -6,9 +6,10 @@ import android.app.DialogFragment;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -33,9 +34,9 @@ import java.util.concurrent.TimeoutException;
 
 
 public class MainActivity extends AppCompatActivity {
-    public static String dataFromAsyncTask;
-    final public String folder_name = getString(R.string.folder_name);
-    final public String file_name = getString(R.string.file_name);
+    public String dataFromAsyncTask = "0";
+    public String folder_name;
+    public String file_name;
     double exchangeRate = 0;
     Button button;
     EditText editText, editText2;
@@ -56,10 +57,13 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        folder_name = getString(R.string.folder_name);
+        file_name = getString(R.string.file_name);
         editText = (EditText) findViewById(R.id.editText);
         editText2 = (EditText) findViewById(R.id.editText2);
         button = (Button) findViewById(R.id.button);
         file = this.getSharedPreferences(folder_name, Context.MODE_PRIVATE);
+
 
         if (!file.contains(file_name))
             Toast.makeText(MainActivity.this, "Update Exchange Rate", Toast.LENGTH_LONG).show();
@@ -121,7 +125,9 @@ public class MainActivity extends AppCompatActivity {
             String inputStream = extractExchangeRate(IOUtils.toString(is, "UTF-8"));
 
             if (inputStream != null)
+            {
                 Log.d("Paul", "It worked");
+            }
             return inputStream;
         }finally{
             if (is !=null) {
@@ -193,26 +199,45 @@ public class MainActivity extends AppCompatActivity {
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.update_exchange_rate) {
-            try {
-                dataFromAsyncTask = new ReadFromWebsite().execute().get(10,TimeUnit.SECONDS);
-            } catch (InterruptedException e) {
-                Log.d("Paul", String.valueOf(e));
-            } catch (ExecutionException e) {
-                Log.d("Paul", String.valueOf(e));
-            } catch (TimeoutException e) {
-                dialog.show(getFragmentManager(), "");
-                Log.d("Paul", String.valueOf(e));
+            ConnectivityManager connMgr = (ConnectivityManager)
+                    getSystemService(Context.CONNECTIVITY_SERVICE);
+            NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
+            if (networkInfo != null && networkInfo.isConnected()) {
+                try {
+                    dataFromAsyncTask = new ReadFromWebsite().execute().get(10, TimeUnit.SECONDS);
+                } catch (InterruptedException e) {
+                    setDialog("Update Failed");
+                    Log.d("Paul", String.valueOf(e));
+                } catch (ExecutionException e) {
+                    setDialog("Update Failed");
+                    Log.d("Paul", String.valueOf(e));
+                } catch (TimeoutException e) {
+                    setDialog("System Timed Out");
+                    Log.d("Paul", String.valueOf(e));
+                }
+                Log.d("Paul", "The file name is " + file_name);
+                Log.d("Paul", "Exchange rate is " + dataFromAsyncTask);
+                exchangeRate = Double.parseDouble(dataFromAsyncTask);
+                Log.d("Paul", "The Exchange rate variable has been changed to " + String.format("%.4f", exchangeRate));
+                editor = file.edit();
+                if (editor.putString(file_name, dataFromAsyncTask).commit()) {
+                    Log.d("Paul", "written to file");
+                }
             }
-            Log.d("Paul", "Exchange rate is "+dataFromAsyncTask);//editText2.setText(dataFromAsyncTask);
-            exchangeRate = Double.parseDouble(dataFromAsyncTask);
-            Log.d("Paul", "The Exchange rate variable has been changed to " + String.format("%.4f", exchangeRate));
-            editor = file.edit();
-            if(editor.putString(file_name, dataFromAsyncTask).commit())
-                Log.d("Paul", "written to file");
+            else
+                setDialog("No Network Connection");
             return true;
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    public void setDialog(String message)
+    {
+        Bundle args = new Bundle();
+        args.putString("message", message);
+        dialog.setArguments(args);
+        dialog.show(getFragmentManager(), "");
     }
     public class OkDialog extends DialogFragment
     {
@@ -224,10 +249,12 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public Dialog onCreateDialog(Bundle savedInstanceState)
         {
+            Bundle args = getArguments();
+            String message = args.getString("message", "");
 
             return new AlertDialog.Builder(getActivity())
                     .setTitle("")
-                    .setMessage("System Timed Out")
+                    .setMessage(message)
                     .setNeutralButton("OK", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
