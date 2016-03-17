@@ -50,7 +50,7 @@ public class MainActivity extends AppCompatActivity {
      * See https://g.co/AppIndexing/AndroidStudio for more information.
      */
     private GoogleApiClient client2;
-
+/*going to add that extra option now*/
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
