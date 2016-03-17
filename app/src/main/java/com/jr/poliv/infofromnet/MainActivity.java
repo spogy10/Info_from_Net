@@ -236,7 +236,7 @@ public class MainActivity extends AppCompatActivity {
             if (!file.contains(file_name))
                 Toast.makeText(MainActivity.this, "Update Exchange Rate", Toast.LENGTH_LONG).show();
             else{
-                setDialog("US$1 = JA$"+ file.getString(file_name, "0"));
+                setDialog("US$1 = JA$ "+ file.getString(file_name, "0"));
             }
 
 
