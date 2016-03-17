@@ -50,7 +50,7 @@ public class MainActivity extends AppCompatActivity {
      * See https://g.co/AppIndexing/AndroidStudio for more information.
      */
     private GoogleApiClient client2;
-/*going to add that extra option now*/
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -227,6 +227,23 @@ public class MainActivity extends AppCompatActivity {
             else
                 setDialog("No Network Connection");
             return true;
+        }
+
+        if (id == R.id.display_exchange_rate) {
+
+            if (!file.contains(file_name))
+                Toast.makeText(MainActivity.this, "Update Exchange Rate", Toast.LENGTH_LONG).show();
+            else{
+                Toast.makeText(MainActivity.this, "$ " + file.getString(file_name, "0"), Toast.LENGTH_LONG).show();
+            }
+
+
+
+
+
+
+
+
         }
 
         return super.onOptionsItemSelected(item);

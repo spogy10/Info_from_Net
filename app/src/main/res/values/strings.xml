@@ -1,6 +1,7 @@
 <resources>
-    <string name="app_name">Info from Net</string>
+    <string name="app_name">Currency Converter</string>
     <string name="update_exchange_rate">Update Exchange Rate</string>
+    <string name="display_exchange_rate">Display Exchange Rate</string>
     <string name="text_view_id">text</string>
     <string name="title_activity_main2">Main2Activity</string>
     <string name="button_label">convert</string>
