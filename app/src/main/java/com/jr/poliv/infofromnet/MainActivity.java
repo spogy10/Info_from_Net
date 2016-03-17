@@ -217,8 +217,10 @@ public class MainActivity extends AppCompatActivity {
                 }
                 Log.d("Paul", "The file name is " + file_name);
                 Log.d("Paul", "Exchange rate is " + dataFromAsyncTask);
-                exchangeRate = Double.parseDouble(dataFromAsyncTask);
-                Log.d("Paul", "The Exchange rate variable has been changed to " + String.format("%.4f", exchangeRate));
+                if (Double.parseDouble(dataFromAsyncTask) != 0 ) {
+                    exchangeRate = Double.parseDouble(dataFromAsyncTask);
+                    Log.d("Paul", "The Exchange rate variable has been changed to " + String.format("%.4f", exchangeRate));
+                }
                 editor = file.edit();
                 if (editor.putString(file_name, dataFromAsyncTask).commit()) {
                     Log.d("Paul", "written to file");
@@ -234,7 +236,7 @@ public class MainActivity extends AppCompatActivity {
             if (!file.contains(file_name))
                 Toast.makeText(MainActivity.this, "Update Exchange Rate", Toast.LENGTH_LONG).show();
             else{
-                Toast.makeText(MainActivity.this, "$ " + file.getString(file_name, "0"), Toast.LENGTH_LONG).show();
+                setDialog("US$1 = JA$"+ file.getString(file_name, "0"));
             }
 
 
