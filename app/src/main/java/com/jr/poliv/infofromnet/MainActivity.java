@@ -87,11 +87,6 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         });
-
-
-
-
-
     }
 
     public double jaToUs(double ja){
