@@ -94,8 +94,9 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void afterTextChanged(Editable arg0) {
-                if (!( (editText.getText().toString().equals("")) || (editText.getText().toString().equals(".")) ))
-                    setUS();
+                if(editText.isFocused())
+                    if (!( (editText.getText().toString().equals("")) || (editText.getText().toString().equals(".")) ))
+                        setUS();
             }
 
         });
@@ -112,8 +113,9 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void afterTextChanged(Editable arg0) {
-                if (!( (editText2.getText().toString().equals("")) || (editText2.getText().toString().equals(".")) ))
-                    setJA();
+                if(editText2.isFocused())
+                    if (!( (editText2.getText().toString().equals("")) || (editText2.getText().toString().equals(".")) ))
+                        setJA();
             }
 
         });
