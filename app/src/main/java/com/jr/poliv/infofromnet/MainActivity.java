@@ -89,9 +89,12 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void afterTextChanged(Editable arg0) {
-                if(editText.isFocused())
-                    if (!( (editText.getText().toString().equals("")) || (editText.getText().toString().equals(".")) ))
-                        setUS();
+                if (exchangeRate == 0)
+                    Toast.makeText(MainActivity.this, "Update Exchange Rate", Toast.LENGTH_LONG).show();
+                else
+                    if(editText.isFocused())
+                        if (!( (editText.getText().toString().equals("")) || (editText.getText().toString().equals(".")) ))
+                            setUS();
             }
 
         });
@@ -108,9 +111,12 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void afterTextChanged(Editable arg0) {
-                if(editText2.isFocused())
-                    if (!( (editText2.getText().toString().equals("")) || (editText2.getText().toString().equals(".")) ))
-                        setJA();
+                if (exchangeRate == 0)
+                    Toast.makeText(MainActivity.this, "Update Exchange Rate", Toast.LENGTH_LONG).show();
+                else
+                    if(editText2.isFocused())
+                        if (!( (editText2.getText().toString().equals("")) || (editText2.getText().toString().equals(".")) ))
+                            setJA();
             }
 
         });
