@@ -8,11 +8,15 @@ import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -20,6 +24,8 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.google.android.gms.appindexing.Action;
+import com.google.android.gms.appindexing.AppIndex;
 import com.google.android.gms.common.api.GoogleApiClient;
 
 import org.apache.commons.io.IOUtils;
@@ -50,6 +56,11 @@ public class MainActivity extends AppCompatActivity {
      * See https://g.co/AppIndexing/AndroidStudio for more information.
      */
     private GoogleApiClient client2;
+    /**
+     * ATTENTION: This was auto-generated to implement the App Indexing API.
+     * See https://g.co/AppIndexing/AndroidStudio for more information.
+     */
+    private GoogleApiClient client;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,9 +78,45 @@ public class MainActivity extends AppCompatActivity {
 
         if (!file.contains(file_name))
             Toast.makeText(MainActivity.this, "Update Exchange Rate", Toast.LENGTH_LONG).show();
-        else{
+        else {
             exchangeRate = Double.parseDouble(file.getString(file_name, "0"));
         }
+
+        editText.addTextChangedListener(new TextWatcher() {
+
+            @Override
+            public void onTextChanged(CharSequence cs, int arg1, int arg2, int arg3) {
+
+            }
+
+            @Override
+            public void beforeTextChanged(CharSequence arg0, int arg1, int arg2, int arg3) { }
+
+            @Override
+            public void afterTextChanged(Editable arg0) {
+                if (!( (editText.getText().toString().equals("")) || (editText.getText().toString().equals(".")) ))
+                    setUS();
+            }
+
+        });
+
+        editText2.addTextChangedListener(new TextWatcher() {
+
+            @Override
+            public void onTextChanged(CharSequence cs, int arg1, int arg2, int arg3) {
+
+            }
+
+            @Override
+            public void beforeTextChanged(CharSequence arg0, int arg1, int arg2, int arg3) { }
+
+            @Override
+            public void afterTextChanged(Editable arg0) {
+                if (!( (editText2.getText().toString().equals("")) || (editText2.getText().toString().equals(".")) ))
+                    setJA();
+            }
+
+        });
 
         button.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -79,30 +126,37 @@ public class MainActivity extends AppCompatActivity {
                 else {
                     if (editText.getText().toString().equals("") && (editText2.getText().toString().equals("")))
                         Toast.makeText(MainActivity.this, "Both fields cannot be empty", Toast.LENGTH_LONG).show();
+                    else if (editText.getText().toString().equals(""))
+                        setJA();
                     else
-                        if (editText.getText().toString().equals(""))
-                            setJA();
-                        else
-                            setUS();
+                        setUS();
                 }
             }
         });
+        // ATTENTION: This was auto-generated to implement the App Indexing API.
+        // See https://g.co/AppIndexing/AndroidStudio for more information.
+        client = new GoogleApiClient.Builder(this).addApi(AppIndex.API).build();
     }
 
-    public double jaToUs(double ja){
-        return ja/exchangeRate;
+    public void afterTextChanged (Editable s){
+        Toast.makeText(MainActivity.this, "did it work", Toast.LENGTH_SHORT).show();
+
     }
 
-    public double usTOJa(double us){
+    public double jaToUs(double ja) {
+        return ja / exchangeRate;
+    }
+
+    public double usTOJa(double us) {
         return us * exchangeRate;
     }
 
-    public void setUS(){
-        editText2.setText(String.format("%.2f",jaToUs(Double.parseDouble(editText.getText().toString()))));
+    public void setUS() {
+        editText2.setText(String.format("%.2f", jaToUs(Double.parseDouble(editText.getText().toString()))));
     }
 
-    public  void setJA(){
-        editText.setText(String.format("%.2f",usTOJa(Double.parseDouble(editText2.getText().toString()))));
+    public void setJA() {
+        editText.setText(String.format("%.2f", usTOJa(Double.parseDouble(editText2.getText().toString()))));
     }
 
     public String getInfoFromWebsite() throws IOException {
@@ -119,13 +173,12 @@ public class MainActivity extends AppCompatActivity {
             is = in.getInputStream();
             String inputStream = extractExchangeRate(IOUtils.toString(is, "UTF-8"));
 
-            if (inputStream != null)
-            {
+            if (inputStream != null) {
                 Log.d("Paul", "It worked");
             }
             return inputStream;
-        }finally{
-            if (is !=null) {
+        } finally {
+            if (is != null) {
                 is.close();
             }
         }
@@ -140,7 +193,7 @@ public class MainActivity extends AppCompatActivity {
 //        return new String(buffer);
 //    }
 
-    public static String extractExchangeRate(String string){
+    public static String extractExchangeRate(String string) {
         String intro = "<b>10-DAY MOVING AVERAGE RATE</b></td>\n" +
                 "                          </tr>\n" +
                 "                          <tr>\n" +
@@ -151,11 +204,51 @@ public class MainActivity extends AppCompatActivity {
                 "                          \n" +
                 "\t\t\t\t\t<tr><td >USD</td><td align=\"right\">";
         string = string.substring(string.indexOf(intro));
-        return string.substring(intro.length(),intro.length()+8);
+        return string.substring(intro.length(), intro.length() + 8);
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+
+        // ATTENTION: This was auto-generated to implement the App Indexing API.
+        // See https://g.co/AppIndexing/AndroidStudio for more information.
+        client.connect();
+        Action viewAction = Action.newAction(
+                Action.TYPE_VIEW, // TODO: choose an action type.
+                "Main Page", // TODO: Define a title for the content shown.
+                // TODO: If you have web page content that matches this app activity's content,
+                // make sure this auto-generated web page URL is correct.
+                // Otherwise, set the URL to null.
+                Uri.parse("http://host/path"),
+                // TODO: Make sure this auto-generated app deep link URI is correct.
+                Uri.parse("android-app://com.jr.poliv.infofromnet/http/host/path")
+        );
+        AppIndex.AppIndexApi.start(client, viewAction);
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+
+        // ATTENTION: This was auto-generated to implement the App Indexing API.
+        // See https://g.co/AppIndexing/AndroidStudio for more information.
+        Action viewAction = Action.newAction(
+                Action.TYPE_VIEW, // TODO: choose an action type.
+                "Main Page", // TODO: Define a title for the content shown.
+                // TODO: If you have web page content that matches this app activity's content,
+                // make sure this auto-generated web page URL is correct.
+                // Otherwise, set the URL to null.
+                Uri.parse("http://host/path"),
+                // TODO: Make sure this auto-generated app deep link URI is correct.
+                Uri.parse("android-app://com.jr.poliv.infofromnet/http/host/path")
+        );
+        AppIndex.AppIndexApi.end(client, viewAction);
+        client.disconnect();
     }
 
 
-   public class ReadFromWebsite extends AsyncTask<Object, Void, String> {
+    public class ReadFromWebsite extends AsyncTask<Object, Void, String> {
 
         @Override
         protected String doInBackground(Object[] params) {
@@ -170,12 +263,12 @@ public class MainActivity extends AppCompatActivity {
         }
 
 
-       protected void onPostExecute(String result){
-           Log.d("Paul", "Result is "+result);
-       }
+        protected void onPostExecute(String result) {
+            Log.d("Paul", "Result is " + result);
+        }
 
 
-   }
+    }
 
 
     @Override
@@ -212,7 +305,7 @@ public class MainActivity extends AppCompatActivity {
                 }
                 Log.d("Paul", "The file name is " + file_name);
                 Log.d("Paul", "Exchange rate is " + dataFromAsyncTask);
-                if (Double.parseDouble(dataFromAsyncTask) != 0 ) {
+                if (Double.parseDouble(dataFromAsyncTask) != 0) {
                     exchangeRate = Double.parseDouble(dataFromAsyncTask);
                     Log.d("Paul", "The Exchange rate variable has been changed to " + String.format("%.4f", exchangeRate));
                 }
@@ -220,8 +313,7 @@ public class MainActivity extends AppCompatActivity {
                 if (editor.putString(file_name, dataFromAsyncTask).commit()) {
                     Log.d("Paul", "written to file");
                 }
-            }
-            else
+            } else
                 setDialog("No Network Connection");
             return true;
         }
@@ -230,15 +322,9 @@ public class MainActivity extends AppCompatActivity {
 
             if (!file.contains(file_name))
                 Toast.makeText(MainActivity.this, "Update Exchange Rate", Toast.LENGTH_LONG).show();
-            else{
-                setDialog("US$1 = JA$ "+ file.getString(file_name, "0"));
+            else {
+                setDialog("US$1 = JA$ " + file.getString(file_name, "0"));
             }
-
-
-
-
-
-
 
 
         }
@@ -246,23 +332,20 @@ public class MainActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    public void setDialog(String message)
-    {
+    public void setDialog(String message) {
         Bundle args = new Bundle();
         args.putString("message", message);
         dialog.setArguments(args);
         dialog.show(getFragmentManager(), "");
     }
-    public class OkDialog extends DialogFragment
-    {
-        public OkDialog()
-        {
+
+    public class OkDialog extends DialogFragment {
+        public OkDialog() {
 
         }
 
         @Override
-        public Dialog onCreateDialog(Bundle savedInstanceState)
-        {
+        public Dialog onCreateDialog(Bundle savedInstanceState) {
             Bundle args = getArguments();
             String message = args.getString("message", "");
 
