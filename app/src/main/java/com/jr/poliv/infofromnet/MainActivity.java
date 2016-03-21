@@ -16,11 +16,8 @@ import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
-import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
@@ -44,7 +41,6 @@ public class MainActivity extends AppCompatActivity {
     public String folder_name;
     public String file_name;
     double exchangeRate = 0;
-    Button button;
     EditText editText, editText2;
     DialogFragment dialog = new OkDialog();
     SharedPreferences file;
@@ -72,7 +68,6 @@ public class MainActivity extends AppCompatActivity {
         file_name = getString(R.string.file_name);
         editText = (EditText) findViewById(R.id.editText);
         editText2 = (EditText) findViewById(R.id.editText2);
-        button = (Button) findViewById(R.id.button);
         file = this.getSharedPreferences(folder_name, Context.MODE_PRIVATE);
 
 
@@ -120,21 +115,6 @@ public class MainActivity extends AppCompatActivity {
 
         });
 
-        button.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (exchangeRate == 0)
-                    Toast.makeText(MainActivity.this, "Update Exchange Rate", Toast.LENGTH_LONG).show();
-                else {
-                    if (editText.getText().toString().equals("") && (editText2.getText().toString().equals("")))
-                        Toast.makeText(MainActivity.this, "Both fields cannot be empty", Toast.LENGTH_LONG).show();
-                    else if (editText.getText().toString().equals(""))
-                        setJA();
-                    else
-                        setUS();
-                }
-            }
-        });
         // ATTENTION: This was auto-generated to implement the App Indexing API.
         // See https://g.co/AppIndexing/AndroidStudio for more information.
         client = new GoogleApiClient.Builder(this).addApi(AppIndex.API).build();
